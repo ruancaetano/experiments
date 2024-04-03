@@ -1,0 +1,37 @@
+Execução 1
+
+  INSTNACES: 5
+  thread: 10
+  connections: 50
+  time: 30s
+  p90: 
+  p99: 
+  RPS: 
+  total requests: 
+
+-------------
+
+Execução 2
+
+  INSTNACES: 5
+  thread: 10
+  connections: 50
+  time: 30s
+  p90: 
+  p99: 
+  RPS: 
+  total requests: 
+
+
+-------------
+
+Execução 3
+
+  INSTNACES: 5
+  thread: 10
+  connections: 50
+  time: 30s
+  p90: 
+  p99: 
+  RPS: 
+  total requests: 
