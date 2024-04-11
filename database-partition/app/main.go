@@ -6,8 +6,6 @@ import (
 	"log"
 	"math/rand"
 	"time"
-
-	_ "github.com/lib/pq"
 )
 
 const (
@@ -17,9 +15,8 @@ const (
 	password = "root"
 	dbname   = "postgres"
 
-	maxEventsToInsert = 10000
-	numberOfWorkers   = 100
-	insertQuery       = `INSERT INTO log_events (event_type, event_description, event_application) VALUES ($1, $2, $3)`
+	maxEventsToInsert = 100000
+	numberOfWorkers   = 50
 )
 
 var (
@@ -54,43 +51,22 @@ func main() {
 	fmt.Println("Tempo de execução:", elapsedTime)
 }
 
-func connectToDb() *sql.DB {
-	connStr := fmt.Sprintf("host=%s port=%d user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	db, err := sql.Open("postgres", connStr)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = db.Ping()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return db
-}
-
 func generateRandomEvents(db *sql.DB, countChan chan int) {
 	for idx := range countChan {
 		eventType := eventTypes[rand.Intn(len(eventTypes))]
 		eventDescription := fmt.Sprintf("This is a random event %d", idx)
 		eventApplication := eventApplications[rand.Intn(len(eventApplications))]
 
-		insertLogEvent(db, eventType, eventDescription, eventApplication)
+		_, err := insertLogEvent(db, eventType, eventDescription, eventApplication, generateRandomDate())
+		if err != nil {
+			log.Printf("Error: %s", err.Error())
+		}
 
 	}
 }
 
-func insertLogEvent(db *sql.DB, eventType string, eventDescription string, eventApplication string) error {
-	stmt, err := db.Prepare(insertQuery)
-	if err != nil {
-		return err
-	}
-	defer stmt.Close()
-
-	_, err = stmt.Exec(eventType, eventDescription, eventApplication)
-	if err != nil {
-		return err
-	}
-	return nil
+func generateRandomDate() time.Time {
+	year := time.Now().Year()
+	firstDayOfTheYear := time.Date(year, 1, 10, 0, 0, 0, 0, time.UTC)
+	return firstDayOfTheYear.AddDate(0, rand.Intn(12), 0)
 }
